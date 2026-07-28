@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.trajectory.nutrition",
+      "sha256_cert_fingerprints": [
+        "FD:B9:00:D5:B1:EA:89:F5:AF:5D:FD:38:0C:38:D4:8D:36:DB:E8:56:38:A1:12:76:3F:6E:A7:4F:56:20:1C:EB"
+      ]
+    }
+  }
+]

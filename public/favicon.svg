@@ -1,0 +1,19 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="squircle">
+      <rect x="0" y="0" width="1024" height="1024" rx="224" ry="224"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#squircle)">
+    <rect width="1024" height="1024" fill="#14171A"/>
+    <!-- gauge ring: ledger-instrument mark, open at top like a dial -->
+    <circle cx="512" cy="512" r="300" fill="none" stroke="#262B30" stroke-width="46"/>
+    <path d="M 512 212 A 300 300 0 1 1 259 662"
+          fill="none" stroke="#4E9C89" stroke-width="46" stroke-linecap="round"/>
+    <!-- trajectory tick: current position marker -->
+    <circle cx="259" cy="662" r="34" fill="#ECEAE4"/>
+    <!-- ledger hairline accents -->
+    <line x1="392" y1="512" x2="632" y2="512" stroke="#ECEAE4" stroke-width="14" stroke-linecap="round" opacity="0.92"/>
+    <line x1="512" y1="392" x2="512" y2="632" stroke="#ECEAE4" stroke-width="14" stroke-linecap="round" opacity="0.92"/>
+  </g>
+</svg>

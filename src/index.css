@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* §10 design tokens — keep these in sync with src/design/tokens.ts by hand; this file
+     can't import a .ts module, and tokens.ts can't be the source CSS reads at runtime. */
+  --bg: #14171a;
+  --surface: #1d2124;
+  --surface-raised: #262b30;
+  --ink: #eceae4;
+  --ink-muted: #8b9198;
+  /* A translucent white overlay per §10's own table (rgba(255,255,255,0.08), not a
+     hex) — never used with a Tailwind opacity modifier anywhere in the app (checked
+     directly), so it doesn't need the *-rgb/<alpha-value> treatment below; this is
+     already a complete, fixed value. See design/tokens.ts's matching comment. */
+  --hairline: rgba(255, 255, 255, 0.08);
+  --accent: #4e9c89;
+  --accent-warn: #c97b3d;
+  /* Fixed a color-assignment bug found while building the tag chip component (§9.3):
+     these three were cyclically swapped relative to spec §10's table (icmr had off's
+     slot, off had custom's, custom had icmr's). Corrected to the spec's exact hex
+     values — §9.3 calls out the ICMR tag's gold/tan tone specifically as "a deliberate
+     nod to the source" (the printed IFCT book), so which color lands on which source
+     isn't cosmetic here. */
+  --tag-icmr: #c9a24e;
+  --tag-off: #6b84a6;
+  --tag-custom: #8b7ec8;
+
+  /* RGB-triplet twins of the above, one per token, for Tailwind's opacity-modifier
+     syntax only (bg-accent/15 etc.) — Tailwind can't inject an alpha value into a
+     `var(--x)` reference that already resolves to a hex string; it needs
+     `rgb(var(--x-rgb) / <alpha-value>)`, which requires the variable itself to hold a
+     bare "R G B" triplet (see tailwind.config.js's `colors` block). Pre-existing bug,
+     independently found and worked around locally in at least three places while
+     building Parts 3-5 (e.g. HabitTracker/HabitStrip.tsx's inline hexToRgba call) —
+     fixed at the source here so future opacity-modifier usage just works. Keep each
+     pair numerically identical by hand; there's no build step that derives one from the
+     other. */
+  --bg-rgb: 20 23 26;
+  --surface-rgb: 29 33 36;
+  --surface-raised-rgb: 38 43 48;
+  --ink-rgb: 236 234 228;
+  --ink-muted-rgb: 139 145 152;
+  --accent-rgb: 78 156 137;
+  --accent-warn-rgb: 201 123 61;
+  --tag-icmr-rgb: 201 162 78;
+  --tag-off-rgb: 107 132 166;
+  --tag-custom-rgb: 139 126 200;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  /* §12: standalone TWA display — avoid Android's overscroll glow reading as a bug. */
+  overscroll-behavior-y: none;
+}
+
+/* §10: every quantity in the app (kcal, grams, weights, macro counts) renders in
+   tabular-figure monospace. Apply this class at the leaf where a number is rendered,
+   not as a blanket rule — labels and navigation stay in the sans stack. */
+.tabular {
+  font-family:
+    ui-monospace,
+    'JetBrains Mono',
+    'IBM Plex Mono',
+    SFMono-Regular,
+    Menlo,
+    monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Ledger-row hairline dividers (§10) — thin, low-contrast separators used throughout
+   the daily log and history list. */
+.hairline-divide > * + * {
+  border-top: 1px solid var(--hairline);
+}

@@ -1,0 +1,64 @@
+# Curated brand list for the OFF import filter (trajectory-app-technical-specification.md
+# §6.1). A product matches this pipeline's filter if EITHER its countries_tags includes
+# en:india, OR its brands field contains one of the names below (case-insensitive
+# substring match — see off_common.py's is_india_or_curated_brand docstring for why
+# substring, not exact match).
+#
+# Why this list exists at all, given the country-tag filter already runs: OFF's
+# country tagging is set by whoever scans a product, not derived from where it's
+# actually sold — a brand popular in India can still end up scanned and tagged from
+# outside India (an NRI scanning it abroad, a multinational's product photographed by
+# a contributor in another country, etc.), and would be missed by the country filter
+# alone. This list is a small, manually maintained safety net for exactly that gap —
+# not a replacement for the country filter, and not meant to be exhaustive. Includes
+# both multinational brands sold in India (per the spec's own examples: Nestlé,
+# Coca-Cola, PepsiCo) AND major India-headquartered brands that are just as likely to
+# get inconsistently tagged (per the spec's own examples: Britannia, ITC).
+#
+# Edit freely — one brand name per line. Blank lines and lines starting with # are
+# ignored. Keep names short and generic (e.g. "Britannia", not "Britannia Industries
+# Limited") since matching is substring-based against OFF's often-messy `brands` field.
+
+# Multinational — food & beverage
+Nestlé
+Nestle
+Coca-Cola
+PepsiCo
+Pepsi
+Mondelez
+Cadbury
+Unilever
+Hindustan Unilever
+Danone
+Mars
+Ferrero
+Kellanova
+Kellogg's
+General Mills
+Kraft Heinz
+Heinz
+Lindt
+McCain
+Yakult
+Red Bull
+Diageo
+AB InBev
+Budweiser
+Lay's
+Quaker
+Tropicana
+
+# India-headquartered — large national FMCG brands (§6.1's own examples: Britannia, ITC)
+Britannia
+ITC
+Parle
+Haldiram's
+Amul
+Dabur
+Patanjali
+Godrej
+Bikaji
+MTR
+Mother Dairy
+MDH
+Everest

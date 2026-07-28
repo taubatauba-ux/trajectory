@@ -1,0 +1,43 @@
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# never commit signing material
+android-keystore/
+*.keystore
+*.jks
+
+# Android build outputs (the *source* android/ project IS committed per spec §3 —
+# only build artifacts and local.properties, which contains a machine-specific SDK
+# path, are excluded)
+android/local.properties
+android/.gradle/
+android/build/
+android/app/build/
+android/captures/
+android/*.iml
+android/.idea/
+*.apk
+*.aab
+
+# editor / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+
+# logs
+npm-debug.log*
+*.tsbuildinfo
+
+# test/coverage
+coverage/
+
+# Python (scripts/ — §5, §6 data pipelines)
+__pycache__/
+*.pyc
+.pytest_cache/
+scripts/.cache/
+.venv/
+venv/

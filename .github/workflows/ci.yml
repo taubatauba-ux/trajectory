@@ -1,0 +1,38 @@
+name: CI
+
+# Part 7: fast, dependency-light feedback on every push and PR — typecheck, lint, test,
+# and a production build, no Android/Bubblewrap toolchain involved (that's
+# build-apk.yml, which only runs on push to main and takes several minutes for the SDK
+# + Gradle + signing steps alone). This workflow exists so a broken build or a failing
+# test is visible in under a minute, on a branch or a PR, well before anything reaches
+# main and triggers the heavier one.
+#
+# Deliberately does not deploy anything or touch Android — build-apk.yml already owns
+# both, and duplicating either here would just mean two workflows fighting over the
+# same GitHub Pages deployment.
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build

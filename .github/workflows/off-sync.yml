@@ -1,0 +1,89 @@
+name: Sync OFF data
+
+# WHY THIS WORKFLOW EXISTS: §6.2's delta sync (scripts/sync_off_delta.py) needs network
+# access to static.openfoodfacts.org (and, when it falls back to a full reimport,
+# huggingface.co too) — this sandbox's network allowlist blocks both outright (confirmed:
+# `curl -I` -> `403 host_not_allowed`), same reasoning as build-apk.yml's header comment
+# for why the APK compile step lives in CI rather than the sandbox that generated this
+# repo. This workflow is the thing that actually runs scripts/sync_off_delta.py against
+# the real internet, on a schedule, and commits whatever it produced.
+#
+# Schedule note: cron has no native "every 14 days" — true fortnightly scheduling would
+# need external state (which cycle are we on?) that cron itself doesn't track. "1st and
+# 15th of the month" is the common practical approximation (used here), even though the
+# gap between the 15th and the next 1st is sometimes 16-17 days, not 14. That's fine
+# specifically *because* sync_off_delta.py's own fortnight-safety-net check (§6.2,
+# scripts/sync_off_delta.py's decide_sync_action) is what actually enforces correctness —
+# if this schedule ever drifts, skips a run, or someone changes the cadence, the script
+# itself detects "too long since last sync" and falls back to a full reimport rather than
+# silently trusting a gap the cron schedule didn't account for. The schedule just needs
+# to run *often enough*, not exactly every 14 days.
+#
+# Chaining to a rebuild: a commit made with the default GITHUB_TOKEN does NOT trigger
+# other workflows' `on: push` (a deliberate GitHub Actions anti-infinite-loop rule) — so
+# without the explicit "Trigger a rebuild" step below, build-apk.yml would silently NOT
+# pick up new data until its next unrelated run. That step uses `gh workflow run`
+# (explicit API dispatch, not a push event) specifically to route around that limitation,
+# and only fires when there was actually something new to ship.
+
+on:
+  schedule:
+    - cron: '0 3 1,15 * *' # 03:00 UTC on the 1st and 15th — see schedule note above
+  workflow_dispatch: {} # lets you force a sync from the Actions tab without waiting
+
+concurrency:
+  group: sync-off-data
+  cancel-in-progress: false # never cancel a sync mid-write; let it finish or fail cleanly
+
+permissions:
+  contents: write # to commit the updated data files
+  actions: write # to dispatch build-apk.yml at the end (see header comment)
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: scripts/requirements.txt
+
+      - run: pip install -r scripts/requirements.txt
+
+      - name: Run delta sync
+        id: sync
+        run: |
+          python scripts/sync_off_delta.py | tee sync-summary.json
+          echo "action=$(python -c "import json; print(json.load(open('sync-summary.json'))['action'])")" >> "$GITHUB_OUTPUT"
+
+      - name: Commit updated data, if any
+        id: commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/data/off/off_seed.json src/data/off/sync-meta.json
+          if git diff --cached --quiet; then
+            echo "No changes to commit (sync ran but produced no updates)."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            git commit -m "chore(off-sync): ${{ steps.sync.outputs.action }} $(date -u +%Y-%m-%d)"
+            git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Trigger a rebuild so the new data actually reaches the deployed app
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run build-apk.yml --ref "${{ github.ref_name }}"
+
+      - name: Upload sync summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: off-sync-summary
+          path: sync-summary.json
+          retention-days: 90

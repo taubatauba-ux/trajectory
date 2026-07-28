@@ -1,0 +1,20 @@
+# Data pipeline scripts (trajectory-app-technical-specification.md §5, §6). These run
+# offline/standalone — NOT part of the Vite/Node app build (§2's stack table scopes
+# these to Python explicitly) — so they get their own requirements file rather than
+# living in package.json.
+#
+# Install with:  pip install -r scripts/requirements.txt --break-system-packages
+# (or, better, inside a venv: python3 -m venv .venv && . .venv/bin/activate && pip
+# install -r scripts/requirements.txt)
+
+# §5 — ICMR/IFCT 2017 extraction
+pdfplumber>=0.11        # primary PDF table extraction
+camelot-py>=1.0         # fallback extraction for pages pdfplumber misses (§5.3 step 6)
+requests>=2.31          # downloading the source PDF
+
+# §6 — Open Food Facts pipeline
+duckdb>=1.0             # reads the OFF Parquet export directly, incl. over HTTPS
+pandas>=2.0              # tabular wrangling shared by both pipelines
+
+# Testing (scripts/test_*.py)
+pytest>=8.0
