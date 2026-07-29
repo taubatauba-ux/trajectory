@@ -83,7 +83,10 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-
+   
+      - name: Setup Android SDK
+       uses: android-actions/setup-android@v4
+   
       - name: Point Bubblewrap at this runner's JDK + Android SDK
         # Bypasses Bubblewrap's interactive first-run setup wizard (it otherwise always
         # prompts to install its own JDK/SDK, even for --version). GitHub's ubuntu-latest
