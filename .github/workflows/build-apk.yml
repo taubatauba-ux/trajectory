@@ -152,6 +152,7 @@ jobs:
           BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           cp ../twa-manifest.json .
+          chmod +x gradlew
           bubblewrap build
 
       - uses: actions/upload-artifact@v4
