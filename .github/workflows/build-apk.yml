@@ -83,10 +83,10 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-   
+
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
-   
+
       - name: Point Bubblewrap at this runner's JDK + Android SDK
         # Bypasses Bubblewrap's interactive first-run setup wizard (it otherwise always
         # prompts to install its own JDK/SDK, even for --version). GitHub's ubuntu-latest
@@ -150,7 +150,9 @@ jobs:
         env:
           BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: bubblewrap build
+        run: |
+          cp ../twa-manifest.json .
+          bubblewrap build
 
       - uses: actions/upload-artifact@v4
         with:
