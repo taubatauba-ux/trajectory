@@ -77,7 +77,7 @@ def build_query(source_sql: str) -> str:
         {SELECT_COLUMNS_SQL}
         FROM {source_sql}
         WHERE (
-            countries_tags LIKE '%en:india%'
+            list_contains(countries_tags, 'en:india')
             OR EXISTS (
                 SELECT 1 FROM curated_global_brands cb
                 WHERE brands ILIKE '%' || cb.brand || '%'
